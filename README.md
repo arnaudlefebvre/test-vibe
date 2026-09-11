@@ -16,11 +16,10 @@ Le workflow [Deploy Dental Defender to GitHub Pages](.github/workflows/deploy-pa
 
 Après avoir envoyé le projet sur GitHub :
 
-1. ouvrez l'onglet **Actions**, puis lancez le workflow si aucun déploiement n'a encore été déclenché ;
-2. le workflow active automatiquement GitHub Pages et sélectionne GitHub Actions comme source lors du premier déploiement ;
-3. récupérez l'adresse publique affichée dans le résumé du déploiement.
-
-L'activation automatique nécessite que GitHub Pages soit disponible pour le dépôt et que les Actions soient autorisées dans **Settings → Actions → General**. Si l'organisation interdit l'activation de Pages par workflow, activez-la manuellement dans **Settings → Pages → Build and deployment → GitHub Actions**, puis relancez le workflow.
+1. ouvrez **Settings → Pages** dans le dépôt ;
+2. dans **Build and deployment → Source**, sélectionnez **GitHub Actions** ;
+3. ouvrez l'onglet **Actions**, puis lancez le workflow si aucun déploiement n'a encore été déclenché ;
+4. récupérez l'adresse publique affichée dans le résumé du déploiement.
 
 Pour un dépôt nommé `dental-defender`, l'adresse sera généralement :
 

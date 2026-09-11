@@ -23,13 +23,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
-        with:
-          # Create the Pages site when it has not been enabled in the repository yet.
-          enablement: true
 
       - name: Upload static website
         uses: actions/upload-pages-artifact@v3
