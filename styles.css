@@ -42,3 +42,5 @@ footer { min-height:76px; display:flex; justify-content:space-between; align-ite
 @media (max-width:950px){.game-layout{grid-template-columns:1fr}.sidebar{padding-top:0;display:grid;grid-template-columns:1fr 1fr}.tip-card{grid-column:1/-1}.game-area{height:clamp(570px,74vh,760px)}}
 @media (max-height:560px) and (orientation:landscape){.game-area{height:calc(100svh - 145px);min-height:390px}.sidebar,footer{display:none}}
 @media (max-width:620px){.topbar{height:78px;padding:0 18px}.brand-mark{width:43px;height:43px}.brand strong{font-size:17px}.sound-wrap>span{display:none}.game-layout{width:calc(100% - 24px);margin-top:22px}.game-head{height:58px}.game-area{height:min(78svh,720px);min-height:500px;border-radius:15px}.game-hud{padding:16px}.game-message{width:calc(100% - 30px);padding:24px 18px}.sidebar{grid-template-columns:1fr}.tip-card{grid-column:auto}.controls-hint{font-size:7px}footer{padding:18px;gap:10px}.pause-button{padding:8px 10px}h1{font-size:21px}}
+
+.bonus-status{position:absolute;z-index:4;top:82px;left:50%;transform:translateX(-50%);color:#fff;font-size:10px;font-weight:900;letter-spacing:1px;text-shadow:0 1px 4px #101947;}
