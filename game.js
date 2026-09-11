@@ -16,8 +16,9 @@ const GAME_CONFIG = {
   levels: 12,
   wavesPerLevel: 3,
   enemiesPerWave: 10,
-  enemiesPerLevel: 3,
-  enemiesPerWaveIncrement: 2,
+  enemiesPerLevel: 8,
+  enemiesPerWaveIncrement: 1,
+  enemiesPerWaveBase: 20,
   startingLives: 3,
   maxLives: 5,
   enemySpeedPerLevel: .12,
@@ -37,7 +38,7 @@ const bossTypes = [
   {name:'CARIE VOLANTE', color:'#8456d8', accent:'#b28bea'},
   {name:'MÉGAMOLAIRE', color:'#4bbfc8', accent:'#a0f7f1'}
 ];
-const bonusFrequencyDivider = 3;
+const bonusFrequencyDivider = 9;
 const bonusTypes = [{type:'speed',label:'PLUS VITE',color:'#61d9df',chance:.16/bonusFrequencyDivider},{type:'wide',label:'TIR LARGE',color:'#ffd166',chance:.13/bonusFrequencyDivider},{type:'double',label:'DOUBLE TIR',color:'#ff8fab',chance:.09/bonusFrequencyDivider},{type:'triple',label:'TRIPLE TIR',color:'#c9a7ff',chance:.04/bonusFrequencyDivider},{type:'five',label:'CINQ TIRS',color:'#b7a0ff',chance:.02/bonusFrequencyDivider},{type:'life',label:'+1 VIE',color:'#ff5d7b',chance:.025/bonusFrequencyDivider}];
 
 const enemyTypes = [
@@ -74,10 +75,10 @@ function drawEnemy(e){
 function drawBoss(b){ctx.save();ctx.translate(b.x,b.y);ctx.fillStyle=b.color;ctx.strokeStyle=b.accent;ctx.lineWidth=5;ctx.beginPath();ctx.arc(0,0,48,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.fillStyle='#17204c';ctx.beginPath();ctx.arc(-15,-8,6,0,7);ctx.arc(15,-8,6,0,7);ctx.fill();ctx.strokeStyle='#17204c';ctx.lineWidth=3;ctx.beginPath();ctx.arc(0,8,16,0,Math.PI);ctx.stroke();ctx.restore();ctx.fillStyle='#17204c';ctx.fillRect(b.x-70,b.y-68,140,8);ctx.fillStyle='#ff5d7b';ctx.fillRect(b.x-70,b.y-68,140*(b.hp/b.maxHp),8);}
 function spawnBoss(){enemies=[];const type=bossTypes[(level-1)%bossTypes.length],encounter=Math.floor((level-1)/4);boss={...type,x:dimensions().w/2,y:105,hp:GAME_CONFIG.bossHealthStart+encounter*GAME_CONFIG.bossHealthPerEncounter,maxHp:GAME_CONFIG.bossHealthStart+encounter*GAME_CONFIG.bossHealthPerEncounter,phase:1,dir:1,lastAttack:performance.now()};transitionLabel=`MINI-BOSS — ${type.name}`;transitionUntil=performance.now()+GAME_CONFIG.transitionDuration;}
 function bossAttack(now){if(!boss||now-boss.lastAttack<Math.max(650,1100-boss.phase*120))return;const dx=player.x-boss.x,dy=player.y-boss.y,len=Math.hypot(dx,dy)||1;enemies.push({color:boss.color,accent:boss.accent,points:0,speed:0,kind:'tartre',x:boss.x,y:boss.y+40,vx:dx/len*120,vy:dy/len*120,phase:0,bossShot:true});boss.lastAttack=now;}
-function enemiesForWave(targetLevel,targetWave){return GAME_CONFIG.enemiesPerWave+(targetLevel-1)*GAME_CONFIG.enemiesPerLevel+(targetWave-1)*GAME_CONFIG.enemiesPerWaveIncrement;}
+function enemiesForWave(targetLevel,targetWave){return GAME_CONFIG.enemiesPerWaveBase+(targetLevel-1)*GAME_CONFIG.enemiesPerLevel+(targetWave-1)*GAME_CONFIG.enemiesPerWaveIncrement;}
 function totalEnemiesForMission(){let total=0;for(let targetLevel=1;targetLevel<=GAME_CONFIG.levels;targetLevel++)for(let targetWave=1;targetWave<=GAME_CONFIG.wavesPerLevel;targetWave++)total+=enemiesForWave(targetLevel,targetWave);return total;}
 function enemiesBeforeCurrentWave(){let total=0;for(let targetLevel=1;targetLevel<=level;targetLevel++)for(let targetWave=1;targetWave<=GAME_CONFIG.wavesPerLevel;targetWave++){if(targetLevel===level&&targetWave>=wave)break;total+=enemiesForWave(targetLevel,targetWave);}return total;}
-function spawnEnemy(){const d=dimensions(),t=enemyTypes[Math.floor(Math.random()*enemyTypes.length)];const levelFactor=1+(level-1)*GAME_CONFIG.enemySpeedPerLevel+(wave-1)*.05;enemies.push({...t,speed:t.speed*levelFactor*(.8+Math.random()*.4),x:35+Math.random()*(d.w-70),y:-30,phase:Math.random()*6});}
+function spawnEnemy(){const d=dimensions(),t=enemyTypes[Math.floor(Math.random()*enemyTypes.length)];const levelFactor=1+(level-1)*GAME_CONFIG.enemySpeedPerLevel+(wave-1)*.05;const hitPoints=1+Math.floor((level-1)/2)+Math.floor((wave-1)/2);enemies.push({...t,hp:hitPoints,speed:t.speed*levelFactor*(.8+Math.random()*.4),x:35+Math.random()*(d.w-70),y:-30,phase:Math.random()*6});}
 function shoot(){const now=performance.now();if(now-lastShot<280)return;const angles=activeBonuses.five?[0,-30,30]:activeBonuses.triple?[0,-20,20]:[0];const multiplier=activeBonuses.double?2:1;angles.forEach(angle=>{const rad=angle*Math.PI/180;for(let i=0;i<multiplier;i++){const laneOffset=multiplier===2?(i-.5)*14:0;shots.push({x:player.x+laneOffset,y:player.y-42,vx:Math.sin(rad)*470,vy:-Math.cos(rad)*470,wide:!!activeBonuses.wide});}});lastShot=now;beep(520,.04);}
 function maybeSpawnBonus(x,y){let total=0,r=Math.random();for(const b of bonusTypes){total+=b.chance;if(r<total){bonuses.push({...b,x,y,vy:55});break;}}}
 function collectBonus(b){bonuses=bonuses.filter(x=>x!==b);if(b.type==='life')lives=Math.min(5,lives+1);else activeBonuses[b.type]=performance.now()+10000;updateHud();}
@@ -87,9 +88,9 @@ function update(dt,time){
   const d=dimensions(),now=performance.now();if(now<transitionUntil)return;Object.keys(activeBonuses).forEach(type=>{if(activeBonuses[type]<=now)delete activeBonuses[type];});const levelSpeed=GAME_CONFIG.playerSpeedStart*(1+(level-1)*GAME_CONFIG.playerSpeedPerLevel);const speed=activeBonuses.speed?440:levelSpeed;if(joystick.active){player.x+=joystick.x/48*speed*dt;player.y+=joystick.y/48*speed*dt;}if(keys.ArrowUp||keys.w)player.y-=speed*dt;if(keys.ArrowDown||keys.s)player.y+=speed*dt;if(keys.ArrowLeft||keys.a)player.x-=speed*dt;if(keys.ArrowRight||keys.d)player.x+=speed*dt;player.x=Math.max(34,Math.min(d.w-34,player.x));player.y=Math.max(42,Math.min(d.h-34,player.y));if(keys[' '])shoot();
   shots.forEach(s=>{s.x+=(s.vx||0)*dt;s.y+=(s.vy||-470)*dt});shots=shots.filter(s=>s.y>-20);
   if(boss){boss.x+=boss.dir*(58+boss.phase*22)*dt;bonuses.forEach(b=>{b.y+=b.vy*dt;if(Math.hypot(b.x-player.x,b.y-player.y)<38)collectBonus(b)});bonuses=bonuses.filter(b=>b.y<d.h+30);if(boss.x<70||boss.x>d.w-70)boss.dir*=-1;bossAttack(now);for(let j=enemies.length-1;j>=0;j--){const shot=enemies[j];if(shot.bossShot){shot.x+=shot.vx*dt;shot.y+=shot.vy*dt;if(Math.hypot(shot.x-player.x,shot.y-player.y)<18){lives--;enemies.splice(j,1);updateHud();if(lives<=0)endGame();}else if(shot.y>d.h+30)enemies.splice(j,1);}}for(let j=shots.length-1;j>=0;j--){if(Math.hypot(boss.x-shots[j].x,boss.y-shots[j].y)<55){boss.hp--;shots.splice(j,1);if(boss.hp<=boss.maxHp*.66)boss.phase=2;if(boss.hp<=boss.maxHp*.33)boss.phase=3;if(boss.hp<=0){completeBossFight(now);return;}}}return;}
-  const spawnInterval=Math.max(GAME_CONFIG.spawnIntervalMinimum,GAME_CONFIG.spawnIntervalStart*(1-(level-1)*GAME_CONFIG.spawnIntervalDecreasePerLevel));
+  const spawnInterval=Math.max(250,GAME_CONFIG.spawnIntervalStart*(1-(level-1)*GAME_CONFIG.spawnIntervalDecreasePerLevel-(wave-1)*.03));
   if(time-lastSpawn>spawnInterval){spawnEnemy();lastSpawn=time;} enemies.forEach(e=>{e.y+=e.speed*dt;e.phase+=dt*3});bonuses.forEach(b=>{b.y+=b.vy*dt;if(Math.hypot(b.x-player.x,b.y-player.y)<38)collectBonus(b)});bonuses=bonuses.filter(b=>b.y<d.h+30);
-  for(let i=enemies.length-1;i>=0;i--){const e=enemies[i];for(let j=shots.length-1;j>=0;j--){const s=shots[j];if(Math.hypot(e.x-s.x,e.y-s.y)<(s.wide?42:29)){score+=e.points;destroyed++;for(let p=0;p<10;p++)particles.push({x:e.x,y:e.y,vx:(Math.random()-.5)*130,vy:(Math.random()-.5)*130,life:1,color:e.color});enemies.splice(i,1);shots.splice(j,1);maybeSpawnBonus(e.x,e.y);beep(760,.08);updateHud();break;}}if(enemies[i]&&enemies[i].y>d.h-35){enemies.splice(i,1);lives--;updateHud();beep(150,.15);if(lives<=0)endGame();}}
+  for(let i=enemies.length-1;i>=0;i--){const e=enemies[i];for(let j=shots.length-1;j>=0;j--){const s=shots[j];if(Math.hypot(e.x-s.x,e.y-s.y)<(s.wide?42:29)){e.hp--;shots.splice(j,1);if(e.hp<=0){score+=e.points;destroyed++;for(let p=0;p<10;p++)particles.push({x:e.x,y:e.y,vx:(Math.random()-.5)*130,vy:(Math.random()-.5)*130,life:1,color:e.color});enemies.splice(i,1);maybeSpawnBonus(e.x,e.y);beep(760,.08);updateHud();}break;}}if(enemies[i]&&enemies[i].y>d.h-35){enemies.splice(i,1);lives--;updateHud();beep(150,.15);if(lives<=0)endGame();}}
   particles.forEach(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.life-=dt*1.8});particles=particles.filter(p=>p.life>0);
   const waveTarget=enemiesBeforeCurrentWave()+enemiesForWave(level,wave);
   if(destroyed>=waveTarget){
