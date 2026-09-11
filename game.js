@@ -46,7 +46,7 @@ const enemyTypes = [
 function resizeCanvas() { const r=canvas.getBoundingClientRect(); canvas.width=r.width*devicePixelRatio; canvas.height=r.height*devicePixelRatio; ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0); }
 function dimensions(){ return {w:canvas.clientWidth,h:canvas.clientHeight}; }
 function movePlayerToPointer(event){ const r=canvas.getBoundingClientRect(), d=dimensions(); player.x=Math.max(34,Math.min(d.w-34,event.clientX-r.left)); player.y=Math.max(42,Math.min(d.h-34,event.clientY-r.top)); }
-function updateJoystick(event){ const dx=event.clientX-joystick.originX,dy=event.clientY-joystick.originY,len=Math.hypot(dx,dy)||1,max=48,scale=Math.min(1,max/len); joystick.x=dx*scale;joystick.y=dy*scale;joystickEl.querySelector('span').style.transform=	ranslate(px,px); }
+function updateJoystick(event){ const dx=event.clientX-joystick.originX,dy=event.clientY-joystick.originY,len=Math.hypot(dx,dy)||1,max=48,scale=Math.min(1,max/len); joystick.x=dx*scale;joystick.y=dy*scale;joystickEl.querySelector('span').style.transform=`translate(${joystick.x}px,${joystick.y}px)`; }
 
 function drawTooth(x,y,s,color='#f9fbff') {
   ctx.save(); ctx.translate(x,y); ctx.scale(s,s); ctx.fillStyle=color; ctx.strokeStyle='#bcecf0'; ctx.lineWidth=2;
@@ -101,12 +101,8 @@ joystickEl.addEventListener('pointerdown',e=>{e.stopPropagation();joystick.activ
 joystickEl.addEventListener('pointermove',e=>{if(joystick.active&&e.pointerId===joystick.pointerId)updateJoystick(e);});
 const stopJoystick=()=>{joystick.active=false;joystick.pointerId=null;joystick.x=0;joystick.y=0;joystickEl.querySelector('span').style.transform='translate(0,0)';};
 joystickEl.addEventListener('pointerup',stopJoystick);joystickEl.addEventListener('pointercancel',stopJoystick);
-gameArea.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button!==0)return;pointerActive=true;gameArea.setPointerCapture?.(e.pointerId);movePlayerToPointer(e);keys[' ']=true;});
+gameArea.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button!==0)return;pointerActive=true;movePlayerToPointer(e);keys[' ']=true});
 gameArea.addEventListener('pointermove',e=>{if(pointerActive)movePlayerToPointer(e);});
 const stopPointer=()=>{pointerActive=false;keys[' ']=false;};
-gameArea.addEventListener('pointerup',stopPointer);gameArea.addEventListener('pointercancel',stopPointer);gameArea.addEventListener('lostpointercapture',stopPointer);
-gameArea.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button!==0)return;pointerActive=true;movePlayerToPointer(e);keys[' ']=true;});
-gameArea.addEventListener('pointermove',e=>{if(pointerActive)movePlayerToPointer(e);});
 gameArea.addEventListener('pointerup',stopPointer);gameArea.addEventListener('pointercancel',stopPointer);
-startButton.addEventListener('click',startGame);pauseButton.addEventListener('click',()=>{if(!running)return;paused=!paused;pauseButton.innerHTML=paused?'<span>▶</span> REPRENDRE':'<span>Ⅱ</span> PAUSE';});soundButton.addEventListener('click',()=>{soundOn=!soundOn;soundButton.setAttribute('aria-pressed',soundOn);soundButton.setAttribute('aria-label',soundOn?'Désactiver le son':'Activer le son');soundButton.querySelector('.sound-waves').style.display=soundOn?'':'none';});
 window.addEventListener('keydown',e=>{if(['ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault();keys[e.key]=true;});window.addEventListener('keyup',e=>keys[e.key]=false);window.addEventListener('resize',resizeCanvas);resizeCanvas();render();requestAnimationFrame(loop);
