@@ -81,7 +81,8 @@ function update(dt,time){
   if(time-lastSpawn>spawnInterval){spawnEnemy();lastSpawn=time;} shots.forEach(s=>{s.x+=(s.vx||0)*dt;s.y+=(s.vy||-470)*dt});enemies.forEach(e=>{e.y+=e.speed*dt;e.phase+=dt*3});bonuses.forEach(b=>{b.y+=b.vy*dt;if(Math.hypot(b.x-player.x,b.y-player.y)<38)collectBonus(b)});bonuses=bonuses.filter(b=>b.y<d.h+30);
   for(let i=enemies.length-1;i>=0;i--){const e=enemies[i];for(let j=shots.length-1;j>=0;j--){const s=shots[j];if(Math.hypot(e.x-s.x,e.y-s.y)<(s.wide?42:29)){score+=e.points;destroyed++;for(let p=0;p<10;p++)particles.push({x:e.x,y:e.y,vx:(Math.random()-.5)*130,vy:(Math.random()-.5)*130,life:1,color:e.color});enemies.splice(i,1);shots.splice(j,1);maybeSpawnBonus(e.x,e.y);beep(760,.08);updateHud();break;}}if(enemies[i]&&enemies[i].y>d.h-35){enemies.splice(i,1);lives--;updateHud();beep(150,.15);if(lives<=0)endGame();}}
   shots=shots.filter(s=>s.y>-20);particles.forEach(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.life-=dt*1.8});particles=particles.filter(p=>p.life>0);
-  if(destroyed>=level*GAME_CONFIG.enemiesPerWave){
+  const waveTarget=((level-1)*GAME_CONFIG.wavesPerLevel+wave)*GAME_CONFIG.enemiesPerWave;
+  if(destroyed>=waveTarget){
     wave++;
     if(wave>GAME_CONFIG.wavesPerLevel){
       spawnBoss();
