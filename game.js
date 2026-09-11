@@ -101,8 +101,12 @@ joystickEl.addEventListener('pointerdown',e=>{e.stopPropagation();joystick.activ
 joystickEl.addEventListener('pointermove',e=>{if(joystick.active&&e.pointerId===joystick.pointerId)updateJoystick(e);});
 const stopJoystick=()=>{joystick.active=false;joystick.pointerId=null;joystick.x=0;joystick.y=0;joystickEl.querySelector('span').style.transform='translate(0,0)';};
 joystickEl.addEventListener('pointerup',stopJoystick);joystickEl.addEventListener('pointercancel',stopJoystick);
-gameArea.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button!==0)return;pointerActive=true;movePlayerToPointer(e);keys[' ']=true});
+gameArea.addEventListener('pointerdown',e=>{if(e.target.closest('button, #gameMessage, #joystick')||(e.pointerType==='mouse'&&e.button!==0))return;pointerActive=true;movePlayerToPointer(e);keys[' ']=true;});
 gameArea.addEventListener('pointermove',e=>{if(pointerActive)movePlayerToPointer(e);});
 const stopPointer=()=>{pointerActive=false;keys[' ']=false;};
 gameArea.addEventListener('pointerup',stopPointer);gameArea.addEventListener('pointercancel',stopPointer);
+overlay.addEventListener('pointerdown',e=>e.stopPropagation());
+startButton.addEventListener('click',startGame);
+pauseButton.addEventListener('click',()=>{if(!running)return;paused=!paused;pauseButton.innerHTML=paused?'<span>▶</span> REPRENDRE':'<span>Ⅱ</span> PAUSE';});
+soundButton.addEventListener('click',()=>{soundOn=!soundOn;soundButton.setAttribute('aria-pressed',soundOn);soundButton.setAttribute('aria-label',soundOn?'Désactiver le son':'Activer le son');soundButton.querySelector('.sound-waves').style.display=soundOn?'':'none';});
 window.addEventListener('keydown',e=>{if(['ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault();keys[e.key]=true;});window.addEventListener('keyup',e=>keys[e.key]=false);window.addEventListener('resize',resizeCanvas);resizeCanvas();render();requestAnimationFrame(loop);
