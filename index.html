@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#101947" />
+    <title>Dental Defender — Chasse aux caries</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="#" aria-label="Dental Defender, accueil">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 48 48"><path d="M13 5c4-1 7 2 11 2s7-3 11-2c8 2 9 11 6 19-3 9-5 19-10 19-4 0-3-12-7-12s-3 12-7 12c-5 0-7-10-10-19C4 16 5 7 13 5Z"/><path class="spark" d="m31 13 2 4 4 2-4 2-2 4-2-4-4-2 4-2 2-4Z"/></svg>
+          </span>
+          <span><strong>Dental Defender</strong><small>Chasse aux caries</small></span>
+        </a>
+        <div class="sound-wrap">
+          <span>SON</span>
+          <button id="soundToggle" class="icon-button" aria-label="Désactiver le son" aria-pressed="true">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path class="sound-waves" d="M16 8a5 5 0 0 1 0 8M18.5 5.5a9 9 0 0 1 0 13"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <section class="game-layout">
+        <section class="game-panel" aria-labelledby="gameTitle">
+          <div class="game-head">
+            <div>
+              <p class="eyebrow">MISSION EN COURS</p>
+              <h1 id="gameTitle">Nettoyage de printemps !</h1>
+            </div>
+            <button id="pauseButton" class="pause-button"><span>Ⅱ</span> PAUSE</button>
+          </div>
+
+          <div id="gameArea" class="game-area" tabindex="0" aria-label="Zone de jeu. Déplacez le dentiste avec les flèches et tirez avec espace.">
+            <div class="game-hud">
+              <div class="hud-item"><span>SCORE</span><strong id="score">1 250</strong></div>
+              <div class="hud-item center"><span>VAGUE</span><strong><b id="wave">2</b> / 5</strong></div>
+              <div class="hud-item right"><span>VIES</span><div id="lives" class="hearts" aria-label="3 vies">♥ ♥ ♥</div></div>
+            </div>
+            <canvas id="gameCanvas" width="900" height="560"></canvas>
+            <div id="gameMessage" class="game-message">
+              <span class="message-icon">✦</span>
+              <h2>Prêt, dentiste ?</h2>
+              <p>Éliminez les caries avant qu'elles n'atteignent le cabinet.</p>
+              <button id="startButton" class="primary-button">COMMENCER LA MISSION <span>→</span></button>
+            </div>
+            <div class="controls-hint"><kbd>←</kbd><kbd>→</kbd> POUR BOUGER <span></span> <kbd>ESPACE</kbd> POUR NETTOYER</div>
+          </div>
+        </section>
+
+        <aside class="sidebar">
+          <section class="card mission-card">
+            <div class="card-heading"><span class="round-icon target">◎</span><div><p>OBJECTIF</p><h2>Mission du jour</h2></div></div>
+            <div class="mission-copy"><strong>Élimine 30 ennemis</strong><span id="progressText">18 / 30</span></div>
+            <div class="progress-track"><div id="progressBar" style="width:60%"></div></div>
+            <div class="reward"><span>★</span><div><small>RÉCOMPENSE</small><strong>+ 500 points</strong></div></div>
+          </section>
+
+          <section class="card enemies-card">
+            <div class="card-heading"><span class="round-icon warning">!</span><div><p>À SURVEILLER</p><h2>Les ennemis</h2></div></div>
+            <ul class="enemy-list">
+              <li><span class="enemy-icon purple">☠</span><span><strong>Carie vorace</strong><small>100 points</small></span></li>
+              <li><span class="enemy-icon yellow">▰</span><span><strong>Tartre tenace</strong><small>200 points</small></span></li>
+              <li><span class="enemy-icon pink">♛</span><span><strong>Sucre collant</strong><small>300 points</small></span></li>
+            </ul>
+          </section>
+
+          <section class="tip-card">
+            <span class="bulb">☼</span>
+            <div><strong>Conseil du Dr. Molaire</strong><p>Attrape le fil dentaire pour doubler tes tirs !</p></div>
+          </section>
+        </aside>
+      </section>
+
+      <footer><p><span>✦</span> Protège les sourires, une dent à la fois !</p><small>© 2026 Dental Defender</small></footer>
+    </main>
+    <script src="game.js"></script>
+  </body>
+</html>
