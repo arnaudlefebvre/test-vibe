@@ -8,7 +8,7 @@ const soundButton = document.querySelector('#soundToggle');
 
 let running = false, paused = false, soundOn = true, score = 1250, destroyed = 18, lives = 3;
 let player = { x: 450, y: 465, width: 60, height: 66 };
-let shots = [], enemies = [], particles = [], keys = {}, lastShot = 0, lastSpawn = 0;
+let shots = [], enemies = [], particles = [], keys = {}, lastShot = 0, lastSpawn = 0, pointerActive = false;
 
 const enemyTypes = [
   { color:'#8456d8', accent:'#b28bea', points:100, speed:34, kind:'carie' },
@@ -18,6 +18,7 @@ const enemyTypes = [
 
 function resizeCanvas() { const r=canvas.getBoundingClientRect(); canvas.width=r.width*devicePixelRatio; canvas.height=r.height*devicePixelRatio; ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0); }
 function dimensions(){ return {w:canvas.clientWidth,h:canvas.clientHeight}; }
+function movePlayerToPointer(event){ const r=canvas.getBoundingClientRect(), d=dimensions(); player.x=Math.max(34,Math.min(d.w-34,event.clientX-r.left)); }
 
 function drawTooth(x,y,s,color='#f9fbff') {
   ctx.save(); ctx.translate(x,y); ctx.scale(s,s); ctx.fillStyle=color; ctx.strokeStyle='#bcecf0'; ctx.lineWidth=2;
@@ -53,5 +54,9 @@ let previous=performance.now();function loop(time){const dt=Math.min((time-previ
 function updateHud(){document.querySelector('#score').textContent=score.toLocaleString('fr-FR');document.querySelector('#lives').textContent='♥ '.repeat(Math.max(0,lives));document.querySelector('#lives').setAttribute('aria-label',`${lives} vies`);document.querySelector('#progressText').textContent=`${Math.min(destroyed,30)} / 30`;document.querySelector('#progressBar').style.width=`${Math.min(destroyed/30*100,100)}%`;document.querySelector('#wave').textContent=Math.min(5,Math.floor((destroyed-1)/10)+1);}
 function startGame(){running=true;paused=false;overlay.classList.add('hidden');pauseButton.innerHTML='<span>Ⅱ</span> PAUSE';gameArea.focus();}
 function endGame(){running=false;overlay.classList.remove('hidden');overlay.querySelector('h2').textContent='Fin de garde !';overlay.querySelector('p').textContent=`Bravo ! Votre score est de ${score.toLocaleString('fr-FR')} points.`;startButton.innerHTML='REJOUER <span>↻</span>';startButton.onclick=()=>{score=0;destroyed=0;lives=3;enemies=[];shots=[];updateHud();startGame();};}
+gameArea.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button!==0)return;pointerActive=true;gameArea.setPointerCapture?.(e.pointerId);movePlayerToPointer(e);keys[' ']=true;});
+gameArea.addEventListener('pointermove',e=>{if(pointerActive)movePlayerToPointer(e);});
+const stopPointer=()=>{pointerActive=false;keys[' ']=false;};
+gameArea.addEventListener('pointerup',stopPointer);gameArea.addEventListener('pointercancel',stopPointer);gameArea.addEventListener('lostpointercapture',stopPointer);
 startButton.addEventListener('click',startGame);pauseButton.addEventListener('click',()=>{if(!running)return;paused=!paused;pauseButton.innerHTML=paused?'<span>▶</span> REPRENDRE':'<span>Ⅱ</span> PAUSE';});soundButton.addEventListener('click',()=>{soundOn=!soundOn;soundButton.setAttribute('aria-pressed',soundOn);soundButton.setAttribute('aria-label',soundOn?'Désactiver le son':'Activer le son');soundButton.querySelector('.sound-waves').style.display=soundOn?'':'none';});
 window.addEventListener('keydown',e=>{if(['ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault();keys[e.key]=true;});window.addEventListener('keyup',e=>keys[e.key]=false);window.addEventListener('resize',resizeCanvas);resizeCanvas();render();requestAnimationFrame(loop);
