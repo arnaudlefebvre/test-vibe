@@ -5,6 +5,7 @@ const overlay = document.querySelector('#gameMessage');
 const startButton = document.querySelector('#startButton');
 const pauseButton = document.querySelector('#pauseButton');
 const soundButton = document.querySelector('#soundToggle');
+const touchControls = document.querySelector('#touchControls');
 
 let running = false, paused = false, soundOn = true, score = 1250, destroyed = 18, lives = 3;
 let player = { x: 450, y: 465, width: 60, height: 66 };
@@ -58,9 +59,12 @@ let previous=performance.now();function loop(time){const dt=Math.min((time-previ
 function updateHud(){document.querySelector('#score').textContent=score.toLocaleString('fr-FR');document.querySelector('#lives').textContent='♥ '.repeat(Math.max(0,lives));document.querySelector('#lives').setAttribute('aria-label',`${lives} vies`);document.querySelector('#progressText').textContent=`${Math.min(destroyed,30)} / 30`;document.querySelector('#progressBar').style.width=`${Math.min(destroyed/30*100,100)}%`;document.querySelector('#wave').textContent=Math.min(5,Math.floor((destroyed-1)/10)+1);const status=document.querySelector('#bonusStatus');if(status)status.textContent=Object.keys(activeBonuses).length?Object.keys(activeBonuses).map(type=>bonusTypes.find(b=>b.type===type)?.label).join(' + '):'BONUS : —';}
 function startGame(){running=true;paused=false;overlay.classList.add('hidden');pauseButton.innerHTML='<span>Ⅱ</span> PAUSE';gameArea.focus();}
 function endGame(){running=false;overlay.classList.remove('hidden');overlay.querySelector('h2').textContent='Fin de garde !';overlay.querySelector('p').textContent=`Bravo ! Votre score est de ${score.toLocaleString('fr-FR')} points.`;startButton.innerHTML='REJOUER <span>↻</span>';startButton.onclick=()=>{score=0;destroyed=0;lives=3;enemies=[];shots=[];bonuses=[];activeBonuses={};updateHud();startGame();};}
-gameArea.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button!==0)return;pointerActive=true;gameArea.setPointerCapture?.(e.pointerId);movePlayerToPointer(e);keys[' ']=true;});
-gameArea.addEventListener('pointermove',e=>{if(pointerActive)movePlayerToPointer(e);});
+touchControls.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button!==0)return;pointerActive=true;gameArea.setPointerCapture?.(e.pointerId);movePlayerToPointer(e);keys[' ']=true;});
+touchControls.addEventListener('pointermove',e=>{if(pointerActive)movePlayerToPointer(e);});
 const stopPointer=()=>{pointerActive=false;keys[' ']=false;};
-gameArea.addEventListener('pointerup',stopPointer);gameArea.addEventListener('pointercancel',stopPointer);gameArea.addEventListener('lostpointercapture',stopPointer);
+touchControls.addEventListener('pointerup',stopPointer);touchControls.addEventListener('pointercancel',stopPointer);touchControls.addEventListener('lostpointercapture',stopPointer);
+gameArea.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button!==0)return;pointerActive=true;movePlayerToPointer(e);keys[' ']=true;});
+gameArea.addEventListener('pointermove',e=>{if(pointerActive)movePlayerToPointer(e);});
+gameArea.addEventListener('pointerup',stopPointer);gameArea.addEventListener('pointercancel',stopPointer);
 startButton.addEventListener('click',startGame);pauseButton.addEventListener('click',()=>{if(!running)return;paused=!paused;pauseButton.innerHTML=paused?'<span>▶</span> REPRENDRE':'<span>Ⅱ</span> PAUSE';});soundButton.addEventListener('click',()=>{soundOn=!soundOn;soundButton.setAttribute('aria-pressed',soundOn);soundButton.setAttribute('aria-label',soundOn?'Désactiver le son':'Activer le son');soundButton.querySelector('.sound-waves').style.display=soundOn?'':'none';});
 window.addEventListener('keydown',e=>{if(['ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault();keys[e.key]=true;});window.addEventListener('keyup',e=>keys[e.key]=false);window.addEventListener('resize',resizeCanvas);resizeCanvas();render();requestAnimationFrame(loop);
