@@ -71,6 +71,17 @@ function drawDentist(){
   ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,-7,6,.2,Math.PI-.2);ctx.stroke();
   ctx.fillStyle='#55d7dc';ctx.fillRect(-27,11,13,7);ctx.fillRect(14,11,13,7);ctx.restore();
 }
+function drawPlayer(){
+  const sprite=window.spriteTheme?.get('player');
+  if(sprite){ctx.save();ctx.imageSmoothingEnabled=false;ctx.drawImage(sprite,player.x-32,player.y-32,64,64);ctx.restore();return;}
+  drawDentist();
+}
+function drawPlayerProjectile(s){
+  const sprite=window.spriteTheme?.get('player_projectile');
+  const size=s.wide?36:24;
+  if(sprite){ctx.save();ctx.imageSmoothingEnabled=false;ctx.drawImage(sprite,s.x-size/2,s.y-size/2,size,size);ctx.restore();return;}
+  ctx.fillStyle='#62e4e5';ctx.beginPath();ctx.roundRect(s.x-(s.wide?7:3),s.y-12,s.wide?14:6,20,4);ctx.fill();
+}
 function drawEnemy(e){
   ctx.save();ctx.translate(e.x,e.y);ctx.rotate(Math.sin(e.phase)*.12);ctx.fillStyle=e.color;ctx.strokeStyle=e.accent;ctx.lineWidth=3;
   if(e.kind==='tartre'){ctx.beginPath();ctx.roundRect(-22,-17,44,34,10);ctx.fill();ctx.stroke();}
@@ -108,7 +119,7 @@ function update(dt,time){
     } else {transitionLabel=`VAGUE ${wave}`;transitionUntil=now+GAME_CONFIG.transitionDuration;}
   }
 }
-function render(){const d=dimensions();ctx.clearRect(0,0,d.w,d.h);for(let x=50;x<d.w;x+=130)drawTooth(x,120+Math.sin(x)*8,.55,'#182458');enemies.forEach(e=>{if(e.bossShot){ctx.fillStyle=boss?.accent||'#ff9eb9';ctx.beginPath();ctx.arc(e.x,e.y,8,0,Math.PI*2);ctx.fill();}else drawEnemy(e);});if(boss)drawBoss(boss);ctx.fillStyle='#62e4e5';shots.forEach(s=>{ctx.beginPath();ctx.roundRect(s.x-(s.wide?7:3),s.y-12,s.wide?14:6,20,4);ctx.fill();});bonuses.forEach(b=>{ctx.fillStyle=b.color;ctx.beginPath();ctx.arc(b.x,b.y,16,0,Math.PI*2);ctx.fill();ctx.fillStyle='#17204c';ctx.font='900 11px sans-serif';ctx.textAlign='center';ctx.fillText(b.type==='life'?'♥':b.type==='speed'?'»':b.type==='wide'?'▰':b.type==='double'?'Ⅱ':b.type==='triple'?'Ⅲ':'Ⅴ',b.x,b.y+4);});particles.forEach(p=>{ctx.globalAlpha=p.life;ctx.fillStyle=p.color;ctx.fillRect(p.x,p.y,4,4)});ctx.globalAlpha=1;drawDentist();const transitionRemaining=transitionUntil-performance.now();if(transitionRemaining>0){const progress=transitionRemaining/GAME_CONFIG.transitionDuration;ctx.save();ctx.globalAlpha=Math.min(1,progress*2,1-(progress-.5)*2);ctx.fillStyle='#fff';ctx.font='900 22px sans-serif';ctx.textAlign='center';ctx.shadowColor='#101947';ctx.shadowBlur=10;ctx.fillText(transitionLabel,d.w/2,105);ctx.restore();}}
+function render(){const d=dimensions();ctx.clearRect(0,0,d.w,d.h);for(let x=50;x<d.w;x+=130)drawTooth(x,120+Math.sin(x)*8,.55,'#182458');enemies.forEach(e=>{if(e.bossShot){ctx.fillStyle=boss?.accent||'#ff9eb9';ctx.beginPath();ctx.arc(e.x,e.y,8,0,Math.PI*2);ctx.fill();}else drawEnemy(e);});if(boss)drawBoss(boss);shots.forEach(drawPlayerProjectile);bonuses.forEach(b=>{ctx.fillStyle=b.color;ctx.beginPath();ctx.arc(b.x,b.y,16,0,Math.PI*2);ctx.fill();ctx.fillStyle='#17204c';ctx.font='900 11px sans-serif';ctx.textAlign='center';ctx.fillText(b.type==='life'?'♥':b.type==='speed'?'»':b.type==='wide'?'▰':b.type==='double'?'Ⅱ':b.type==='triple'?'Ⅲ':'Ⅴ',b.x,b.y+4);});particles.forEach(p=>{ctx.globalAlpha=p.life;ctx.fillStyle=p.color;ctx.fillRect(p.x,p.y,4,4)});ctx.globalAlpha=1;drawPlayer();const transitionRemaining=transitionUntil-performance.now();if(transitionRemaining>0){const progress=transitionRemaining/GAME_CONFIG.transitionDuration;ctx.save();ctx.globalAlpha=Math.min(1,progress*2,1-(progress-.5)*2);ctx.fillStyle='#fff';ctx.font='900 22px sans-serif';ctx.textAlign='center';ctx.shadowColor='#101947';ctx.shadowBlur=10;ctx.fillText(transitionLabel,d.w/2,105);ctx.restore();}}
 let previous=performance.now();function loop(time){requestAnimationFrame(loop);const dt=Math.min((time-previous)/1000,.035);previous=time;if(running&&!paused)update(dt,time);render();}
 function updateHud(){const totalEnemies=totalEnemiesForMission();document.querySelector('#score').textContent=score.toLocaleString('fr-FR');document.querySelector('#lives').textContent='♥ '.repeat(Math.max(0,lives));document.querySelector('#lives').setAttribute('aria-label',`${lives} vies`);document.querySelector('#progressText').textContent=`${destroyed} / ${totalEnemies}`;document.querySelector('#progressBar').style.width=`${Math.min(destroyed/totalEnemies*100,100)}%`;document.querySelector('#wave').textContent=`${level}.${wave}`;const status=document.querySelector('#bonusStatus');if(status)status.textContent=Object.keys(activeBonuses).length?Object.keys(activeBonuses).map(type=>bonusTypes.find(b=>b.type===type)?.label).join(' + '):'BONUS : —';}
 function startGame(){running=true;paused=false;overlay.classList.add('hidden');if(level===1&&wave===1&&destroyed===0&&bonuses.length===0)spawnGuaranteedLifeBonus();pauseButton.innerHTML='<span>Ⅱ</span> PAUSE';gameArea.focus();}
