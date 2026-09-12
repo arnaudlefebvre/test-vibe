@@ -44,7 +44,7 @@ const themes = {
     rendering: 'sprites',
     assets: {
       player: 'player.png',
-      playerProjectile: 'player_projectile.png',
+      player_projectile: 'player_projectile.png',
       carie: 'enemy_depassement.png',
       tartre: 'enemy_rac.png',
       sucre: 'enemy_delai.png',
