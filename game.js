@@ -84,7 +84,11 @@ function drawPlayer(){
 function drawPlayerProjectile(s){
   const sprite=window.spriteTheme?.get('player_projectile');
   const size=s.wide?36:24;
-  if(sprite){ctx.save();ctx.imageSmoothingEnabled=false;ctx.drawImage(sprite,s.x-size/2,s.y-size/2,size,size);ctx.restore();return;}
+  if(sprite){
+    const vx=typeof s.vx==='number'?s.vx:0;
+    const vy=typeof s.vy==='number'?s.vy:-470;
+    ctx.save();ctx.imageSmoothingEnabled=false;ctx.translate(s.x,s.y);ctx.rotate(Math.atan2(vy,vx));ctx.drawImage(sprite,-size/2,-size/2,size,size);ctx.restore();return;
+  }
   ctx.fillStyle='#62e4e5';ctx.beginPath();ctx.roundRect(s.x-(s.wide?7:3),s.y-12,s.wide?14:6,20,4);ctx.fill();
 }
 function drawEnemy(e){
