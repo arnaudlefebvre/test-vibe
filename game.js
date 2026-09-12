@@ -38,8 +38,8 @@ const bossTypes = [
   {name:'CARIE VOLANTE', color:'#8456d8', accent:'#b28bea'},
   {name:'MÉGAMOLAIRE', color:'#4bbfc8', accent:'#a0f7f1'}
 ];
-const bonusFrequencyDivider = 9;
-const bonusChanceCap = .12;
+const bonusFrequencyDivider = 7;
+const bonusChanceCap = .25;
 const bonusTypes = [{type:'speed',label:'PLUS VITE',color:'#61d9df',chance:.16/bonusFrequencyDivider},{type:'wide',label:'TIR LARGE',color:'#ffd166',chance:.13/bonusFrequencyDivider},{type:'double',label:'DOUBLE TIR',color:'#ff8fab',chance:.09/bonusFrequencyDivider},{type:'triple',label:'TRIPLE TIR',color:'#c9a7ff',chance:.04/bonusFrequencyDivider},{type:'five',label:'CINQ TIRS',color:'#b7a0ff',chance:.02/bonusFrequencyDivider},{type:'life',label:'+1 VIE',color:'#ff5d7b',chance:.025/bonusFrequencyDivider}];
 
 const enemyTypes = [
