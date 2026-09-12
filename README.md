@@ -29,6 +29,8 @@ https://VOTRE-NOM.github.io/dental-defender/
 
 ## Commandes
 
-- **Flèches directionnelles** ou **W/A/S/D** : déplacer le dentiste\r\n- **Souris** : déplacer le dentiste librement dans la zone de jeu\r\n- **Écran tactile** : joystick superposé pour se déplacer ; maintenir le doigt hors du joystick pour tirer
+- **Flèches directionnelles** ou **W/A/S/D** : déplacer le dentiste\r\n- **Souris** : déplacer le dentiste librement dans la zone de jeu\r\n- **Écran tactile** : joystick superposé pour se déplacer ; maintenez le joystick pour vous déplacer et tirer en continu ; un second doigt peut maintenir le tir ailleurs dans la zone de jeu
 - **Espace** : lancer un jet nettoyant
 - Boutons à l'écran pour mettre en pause et activer/désactiver le son
+
+Voir [GAMEPLAY.md](GAMEPLAY.md) pour les règles et paramètres des ennemis.
