@@ -98,3 +98,53 @@ const themes = {
     }
   }
 };
+
+const spriteCache = new Map();
+
+function spriteCacheEntry(assetKey, state, image = null) {
+  return { assetKey, state, image };
+}
+
+function spriteAssetStatus(assetKey) {
+  return spriteCache.get(assetKey)?.state || 'absent';
+}
+
+function getThemeSprite(assetKey) {
+  const entry = spriteCache.get(assetKey);
+  return entry?.state === 'loaded' ? entry.image : null;
+}
+
+function shouldUseProceduralSprite(assetKey) {
+  return spriteAssetStatus(assetKey) !== 'loaded';
+}
+
+function loadThemeAsset(theme, assetKey, filename) {
+  return new Promise(resolve => {
+    const image = new Image();
+    const complete = (state, loadedImage = null) => {
+      spriteCache.set(assetKey, spriteCacheEntry(assetKey, state, loadedImage));
+      if (state !== 'loaded') console.warn(`[sprites] Asset ${state}: ${assetKey} (${filename})`);
+      resolve(spriteCache.get(assetKey));
+    };
+    image.onload = () => complete(image.naturalWidth > 0 && image.naturalHeight > 0 ? 'loaded' : 'invalid', image.naturalWidth > 0 && image.naturalHeight > 0 ? image : null);
+    image.onerror = () => complete('absent');
+    image.src = `${theme.assetRoot}${filename}`;
+  });
+}
+
+function preloadActiveTheme() {
+  const theme = themes[ACTIVE_THEME];
+  if (!theme || theme.rendering !== 'sprites') return Promise.resolve(new Map());
+  return Promise.all(Object.entries(theme.assets).map(([assetKey, filename]) => loadThemeAsset(theme, assetKey, filename)))
+    .then(() => spriteCache);
+}
+
+window.spriteTheme = Object.freeze({
+  get: getThemeSprite,
+  status: spriteAssetStatus,
+  useProceduralFallback: shouldUseProceduralSprite,
+  preload: preloadActiveTheme,
+  cache: spriteCache
+});
+
+preloadActiveTheme();

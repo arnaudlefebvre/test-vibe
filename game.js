@@ -52,7 +52,7 @@ const enemyCompositionOverrides = {};
 function enemyComposition(l,w){const override=enemyCompositionOverrides[`${l}.${w}`];if(override)return override;if(l===1)return [{id:'carie',weight:80},{id:'tartre',weight:20}];const sugar=Math.min(30,10+(l-2)*2+(w-1)*2),tartre=Math.min(35,20+l-1);return [{id:'carie',weight:100-sugar-tartre},{id:'tartre',weight:tartre},{id:'sucre',weight:sugar}];}
 function selectEnemyType(l,w,r=Math.random()){let n=0;for(const x of enemyComposition(l,w)){n+=x.weight;if(r*100<n)return enemyTypes.find(t=>t.id===x.id);}return enemyTypes[0];}
 
-function resizeCanvas() { const r=canvas.getBoundingClientRect(); canvas.width=r.width*devicePixelRatio; canvas.height=r.height*devicePixelRatio; ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0); }
+function resizeCanvas() { const r=canvas.getBoundingClientRect(); canvas.width=r.width*devicePixelRatio; canvas.height=r.height*devicePixelRatio; ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0); ctx.imageSmoothingEnabled=false; }
 function dimensions(){ return {w:canvas.clientWidth,h:canvas.clientHeight}; }
 function movePlayerToPointer(event){ const r=canvas.getBoundingClientRect(), d=dimensions(); player.x=Math.max(34,Math.min(d.w-34,event.clientX-r.left)); player.y=Math.max(42,Math.min(d.h-34,event.clientY-r.top)); }
 function updateJoystick(event){ const dx=event.clientX-joystick.originX,dy=event.clientY-joystick.originY,len=Math.hypot(dx,dy)||1,max=48,scale=Math.min(1,max/len); joystick.x=dx*scale;joystick.y=dy*scale;joystickEl.querySelector('span').style.transform=`translate(${joystick.x}px,${joystick.y}px)`; }
