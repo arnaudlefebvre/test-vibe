@@ -33,4 +33,6 @@ https://VOTRE-NOM.github.io/dental-defender/
 - **Espace** : lancer un jet nettoyant
 - Boutons à l'écran pour mettre en pause et activer/désactiver le son
 
-Voir [GAMEPLAY.md](GAMEPLAY.md) pour les règles et paramètres des ennemis.
+Voir [GAMEPLAY.md](GAMEPLAY.md) pour les règles et paramètres des ennemis, et
+l’[ADR du registre de thèmes et sprites](ADR-THEMES-SPRITES.md) pour les choix
+de rendu et leurs limites de qualification.
