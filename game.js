@@ -18,7 +18,7 @@ const GAME_CONFIG = {
   enemiesPerWave: 10,
   enemiesPerLevel: 8,
   enemiesPerWaveIncrement: 1,
-  enemiesPerWaveBase: 20,
+  enemiesPerWaveBase: 16,
   startingLives: 3,
   maxLives: 5,
   enemySpeedPerLevel: .12,
@@ -38,9 +38,9 @@ const bossTypes = [
   {name:'CARIE VOLANTE', color:'#8456d8', accent:'#b28bea'},
   {name:'MÉGAMOLAIRE', color:'#4bbfc8', accent:'#a0f7f1'}
 ];
-const bonusFrequencyDivider = 7;
+const bonusFrequencyDivider = 3.5;
 const bonusChanceCap = .25;
-const bonusTypes = [{type:'speed',label:'PLUS VITE',color:'#61d9df',chance:.16/bonusFrequencyDivider},{type:'wide',label:'TIR LARGE',color:'#ffd166',chance:.13/bonusFrequencyDivider},{type:'double',label:'DOUBLE TIR',color:'#ff8fab',chance:.09/bonusFrequencyDivider},{type:'triple',label:'TRIPLE TIR',color:'#c9a7ff',chance:.04/bonusFrequencyDivider},{type:'five',label:'CINQ TIRS',color:'#b7a0ff',chance:.02/bonusFrequencyDivider},{type:'life',label:'+1 VIE',color:'#ff5d7b',chance:.025/bonusFrequencyDivider}];
+const bonusTypes = [{type:'speed',label:'PLUS VITE',color:'#61d9df',chance:.16/bonusFrequencyDivider},{type:'wide',label:'TIR LARGE',color:'#ffd166',chance:.13/bonusFrequencyDivider},{type:'double',label:'DOUBLE TIR',color:'#ff8fab',chance:.09/(bonusFrequencyDivider/1.5)},{type:'triple',label:'TRIPLE TIR',color:'#c9a7ff',chance:.04/(bonusFrequencyDivider/1.5)},{type:'five',label:'CINQ TIRS',color:'#b7a0ff',chance:.02/bonusFrequencyDivider},{type:'life',label:'+1 VIE',color:'#ff5d7b',chance:.025/bonusFrequencyDivider}];
 
 const enemyTypes = [
   { id:'carie', color:'#8456d8', accent:'#b28bea', points:100, kind:'carie', abilities:[], stats:{hp:1,speed:34,damage:1}, progression:{hpPerLevel:.35,hpPerWave:.1,speedPerLevel:1.2,speedPerWave:.4,damagePerLevel:0,damagePerWave:0} },
@@ -86,9 +86,11 @@ function enemiesBeforeCurrentWave(){let total=0;for(let targetLevel=1;targetLeve
 function spawnEnemy(){const d=dimensions(),t=selectEnemyType(level,wave),stats=calculateEnemyStats(t,level,wave);enemies.push({...t,...stats,speed:stats.speed*(.8+Math.random()*.4),x:35+Math.random()*(d.w-70),y:-30,phase:Math.random()*6});}
 function shoot(){const now=performance.now();if(now-lastShot<280)return;const angles=activeBonuses.five?[0,-30,30]:activeBonuses.triple?[0,-20,20]:[0];const multiplier=activeBonuses.double?2:1;angles.forEach(angle=>{const rad=angle*Math.PI/180;for(let i=0;i<multiplier;i++){const laneOffset=multiplier===2?(i-.5)*14:0;shots.push({x:player.x+laneOffset,y:player.y-42,vx:Math.sin(rad)*470,vy:-Math.cos(rad)*470,wide:!!activeBonuses.wide,damage:1});}});lastShot=now;beep(520,.04);}
 function maybeSpawnBonus(x,y){const chanceMultiplier=1+(level-1)*.08+(wave-1)*.15;const baseChance=bonusTypes.reduce((sum,b)=>sum+b.chance,0);const chance=Math.min(bonusChanceCap,baseChance*chanceMultiplier);let total=0,r=Math.random();for(const b of bonusTypes){total+=b.chance*chance/baseChance;if(r<total){bonuses.push({...b,x,y,vy:55});break;}}}
+function spawnGuaranteedLifeBonus(){const d=dimensions();bonuses.push({...bonusTypes.find(b=>b.type==='life'),x:35+Math.random()*(d.w-70),y:-30,vy:55});}
+function spawnAutomaticWaveBonus(targetWave){if(targetWave<2||targetWave>GAME_CONFIG.wavesPerLevel)return;const d=dimensions(),types=['life','triple','five'],type=bonusTypes.find(b=>b.type===types[Math.floor(Math.random()*types.length)]);bonuses.push({...type,x:35+Math.random()*(d.w-70),y:d.h*.5,vy:55});}
 function collectBonus(b){bonuses=bonuses.filter(x=>x!==b);if(b.type==='life')lives=Math.min(5,lives+1);else activeBonuses[b.type]=performance.now()+10000;updateHud();}
 function beep(freq,duration){if(!soundOn)return;const AudioCtx=window.AudioContext||window.webkitAudioContext;if(!AudioCtx)return;beep.ctx??=new AudioCtx();const o=beep.ctx.createOscillator(),g=beep.ctx.createGain();o.frequency.value=freq;o.type='sine';g.gain.setValueAtTime(.025,beep.ctx.currentTime);g.gain.exponentialRampToValueAtTime(.001,beep.ctx.currentTime+duration);o.connect(g).connect(beep.ctx.destination);o.start();o.stop(beep.ctx.currentTime+duration);}
-function completeBossFight(now){const defeatedBoss=boss;score+=1000+(defeatedBoss.maxHp-GAME_CONFIG.bossHealthStart)*100;boss=null;enemies=[];shots=[];level++;wave=1;transitionLabel=level>GAME_CONFIG.levels?'MISSION ACCOMPLIE':`NIVEAU ${level}`;transitionUntil=now+GAME_CONFIG.transitionDuration;if(level>GAME_CONFIG.levels)endGame();updateHud();}
+function completeBossFight(now){const defeatedBoss=boss;score+=1000+(defeatedBoss.maxHp-GAME_CONFIG.bossHealthStart)*100;boss=null;enemies=[];shots=[];level++;wave=1;transitionLabel=level>GAME_CONFIG.levels?'MISSION ACCOMPLIE':`NIVEAU ${level}`;transitionUntil=now+GAME_CONFIG.transitionDuration;if(level<=GAME_CONFIG.levels)spawnGuaranteedLifeBonus();if(level>GAME_CONFIG.levels)endGame();updateHud();}
 function update(dt,time){
   const d=dimensions(),now=performance.now();Object.keys(activeBonuses).forEach(type=>{if(activeBonuses[type]<=now)delete activeBonuses[type];});const levelSpeed=GAME_CONFIG.playerSpeedStart*(1+(level-1)*GAME_CONFIG.playerSpeedPerLevel);const speed=activeBonuses.speed?440:levelSpeed;if(joystick.active){player.x+=joystick.x/48*speed*dt;player.y+=joystick.y/48*speed*dt;}if(keys.ArrowUp||keys.w)player.y-=speed*dt;if(keys.ArrowDown||keys.s)player.y+=speed*dt;if(keys.ArrowLeft||keys.a)player.x-=speed*dt;if(keys.ArrowRight||keys.d)player.x+=speed*dt;player.x=Math.max(34,Math.min(d.w-34,player.x));player.y=Math.max(42,Math.min(d.h-34,player.y));if(keys[' ']||joystick.active)shoot();
   shots.forEach(s=>{s.x+=(s.vx||0)*dt;s.y+=(s.vy||-470)*dt});shots=shots.filter(s=>s.y>-20);
@@ -100,6 +102,7 @@ function update(dt,time){
   const waveTarget=enemiesBeforeCurrentWave()+enemiesForWave(level,wave);
   if(destroyed>=waveTarget){
     wave++;
+    spawnAutomaticWaveBonus(wave);
     if(wave>GAME_CONFIG.wavesPerLevel){
       spawnBoss();
     } else {transitionLabel=`VAGUE ${wave}`;transitionUntil=now+GAME_CONFIG.transitionDuration;}
@@ -108,7 +111,7 @@ function update(dt,time){
 function render(){const d=dimensions();ctx.clearRect(0,0,d.w,d.h);for(let x=50;x<d.w;x+=130)drawTooth(x,120+Math.sin(x)*8,.55,'#182458');enemies.forEach(e=>{if(e.bossShot){ctx.fillStyle=boss?.accent||'#ff9eb9';ctx.beginPath();ctx.arc(e.x,e.y,8,0,Math.PI*2);ctx.fill();}else drawEnemy(e);});if(boss)drawBoss(boss);ctx.fillStyle='#62e4e5';shots.forEach(s=>{ctx.beginPath();ctx.roundRect(s.x-(s.wide?7:3),s.y-12,s.wide?14:6,20,4);ctx.fill();});bonuses.forEach(b=>{ctx.fillStyle=b.color;ctx.beginPath();ctx.arc(b.x,b.y,16,0,Math.PI*2);ctx.fill();ctx.fillStyle='#17204c';ctx.font='900 11px sans-serif';ctx.textAlign='center';ctx.fillText(b.type==='life'?'♥':b.type==='speed'?'»':b.type==='wide'?'▰':b.type==='double'?'Ⅱ':b.type==='triple'?'Ⅲ':'Ⅴ',b.x,b.y+4);});particles.forEach(p=>{ctx.globalAlpha=p.life;ctx.fillStyle=p.color;ctx.fillRect(p.x,p.y,4,4)});ctx.globalAlpha=1;drawDentist();const transitionRemaining=transitionUntil-performance.now();if(transitionRemaining>0){const progress=transitionRemaining/GAME_CONFIG.transitionDuration;ctx.save();ctx.globalAlpha=Math.min(1,progress*2,1-(progress-.5)*2);ctx.fillStyle='#fff';ctx.font='900 22px sans-serif';ctx.textAlign='center';ctx.shadowColor='#101947';ctx.shadowBlur=10;ctx.fillText(transitionLabel,d.w/2,105);ctx.restore();}}
 let previous=performance.now();function loop(time){requestAnimationFrame(loop);const dt=Math.min((time-previous)/1000,.035);previous=time;if(running&&!paused)update(dt,time);render();}
 function updateHud(){const totalEnemies=totalEnemiesForMission();document.querySelector('#score').textContent=score.toLocaleString('fr-FR');document.querySelector('#lives').textContent='♥ '.repeat(Math.max(0,lives));document.querySelector('#lives').setAttribute('aria-label',`${lives} vies`);document.querySelector('#progressText').textContent=`${destroyed} / ${totalEnemies}`;document.querySelector('#progressBar').style.width=`${Math.min(destroyed/totalEnemies*100,100)}%`;document.querySelector('#wave').textContent=`${level}.${wave}`;const status=document.querySelector('#bonusStatus');if(status)status.textContent=Object.keys(activeBonuses).length?Object.keys(activeBonuses).map(type=>bonusTypes.find(b=>b.type===type)?.label).join(' + '):'BONUS : —';}
-function startGame(){running=true;paused=false;overlay.classList.add('hidden');pauseButton.innerHTML='<span>Ⅱ</span> PAUSE';gameArea.focus();}
+function startGame(){running=true;paused=false;overlay.classList.add('hidden');if(level===1&&wave===1&&destroyed===0&&bonuses.length===0)spawnGuaranteedLifeBonus();pauseButton.innerHTML='<span>Ⅱ</span> PAUSE';gameArea.focus();}
 function endGame(){running=false;overlay.classList.remove('hidden');overlay.querySelector('h2').textContent='Fin de garde !';overlay.querySelector('p').textContent=`Bravo ! Votre score est de ${score.toLocaleString('fr-FR')} points.`;startButton.innerHTML='REJOUER <span>↻</span>';startButton.onclick=()=>{score=0;destroyed=0;level=1;wave=1;lives=GAME_CONFIG.startingLives;boss=null;enemies=[];shots=[];bonuses=[];activeBonuses={};updateHud();startGame();};}
 joystickEl.addEventListener('pointerdown',e=>{e.stopPropagation();joystick.active=true;joystick.pointerId=e.pointerId;joystick.originX=e.clientX;joystick.originY=e.clientY;joystickEl.setPointerCapture(e.pointerId);updateJoystick(e);});
 joystickEl.addEventListener('pointermove',e=>{if(joystick.active&&e.pointerId===joystick.pointerId)updateJoystick(e);});
