@@ -62,11 +62,34 @@ function dimensions(){ return {w:canvas.clientWidth,h:canvas.clientHeight}; }
 function movePlayerToPointer(event){ const r=canvas.getBoundingClientRect(), d=dimensions(); player.x=Math.max(34,Math.min(d.w-34,event.clientX-r.left)); player.y=Math.max(42,Math.min(d.h-34,event.clientY-r.top)); }
 function updateJoystick(event){ const dx=event.clientX-joystick.originX,dy=event.clientY-joystick.originY,len=Math.hypot(dx,dy)||1,max=48,scale=Math.min(1,max/len); joystick.x=dx*scale;joystick.y=dy*scale;joystickEl.querySelector('span').style.transform=`translate(${joystick.x}px,${joystick.y}px)`; }
 
-function drawTooth(x,y,s,color='#f9fbff') {
-  ctx.save(); ctx.translate(x,y); ctx.scale(s,s); ctx.fillStyle=color; ctx.strokeStyle='#bcecf0'; ctx.lineWidth=2;
-  ctx.beginPath(); ctx.moveTo(-16,-18); ctx.bezierCurveTo(-28,-15,-25,3,-20,15); ctx.bezierCurveTo(-15,30,-7,21,0,12); ctx.bezierCurveTo(7,21,15,30,20,15); ctx.bezierCurveTo(25,3,28,-15,16,-18); ctx.bezierCurveTo(8,-21,6,-14,0,-14); ctx.bezierCurveTo(-6,-14,-8,-21,-16,-18); ctx.fill(); ctx.stroke(); ctx.restore();
-}
-function drawDentist(){
+const BACKGROUND_MOTIF_CONFIG = {
+  spacing: 130,
+  y: 120,
+  wave: 8,
+  radius: 9,
+  color: '#1f6675',
+  accent: '#cb6736',
+  opacity: .16
+};
+function drawBackgroundMotif() {
+  const d = dimensions();
+  const config = BACKGROUND_MOTIF_CONFIG;
+  ctx.save();
+  ctx.globalAlpha = config.opacity;
+  for (let x = 50, index = 0; x < d.w; x += config.spacing, index++) {
+    const y = config.y + Math.sin(x) * config.wave;
+    ctx.strokeStyle = config.color;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(x, y, config.radius, Math.PI * .2, Math.PI * 1.8);
+    ctx.stroke();
+    ctx.fillStyle = index % 4 === 0 ? config.accent : config.color;
+    ctx.beginPath();
+    ctx.arc(x + 5, y - 5, 2.5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+}function drawDentist(){
   const {x,y}=player; ctx.save(); ctx.translate(x,y);
   ctx.fillStyle='#d5f7f5'; ctx.beginPath(); ctx.arc(0,-17,24,0,Math.PI*2);ctx.fill();
   ctx.fillStyle='#253163';ctx.beginPath();ctx.arc(0,-13,18,0,Math.PI*2);ctx.fill();
@@ -130,7 +153,7 @@ function update(dt,time){
     } else {transitionLabel=`VAGUE ${wave}`;transitionUntil=now+GAME_CONFIG.transitionDuration;}
   }
 }
-function render(){const d=dimensions();ctx.clearRect(0,0,d.w,d.h);for(let x=50;x<d.w;x+=130)drawTooth(x,120+Math.sin(x)*8,.55,'#182458');enemies.forEach(e=>{if(e.bossShot){const sprite=window.spriteTheme?.get(e.bossProjectileKey);if(sprite){ctx.save();ctx.imageSmoothingEnabled=false;ctx.drawImage(sprite,e.x-12,e.y-12,24,24);ctx.restore();}else{ctx.fillStyle=boss?.accent||'#ff9eb9';ctx.beginPath();ctx.arc(e.x,e.y,8,0,Math.PI*2);ctx.fill();}}else drawEnemy(e);});if(boss)drawBoss(boss);shots.forEach(drawPlayerProjectile);bonuses.forEach(b=>{const sprite=window.spriteTheme?.get(b.type);if(sprite){ctx.save();ctx.imageSmoothingEnabled=false;ctx.drawImage(sprite,b.x-20,b.y-20,40,40);ctx.restore();}else{ctx.fillStyle=b.color;ctx.beginPath();ctx.arc(b.x,b.y,16,0,Math.PI*2);ctx.fill();ctx.fillStyle='#17204c';ctx.font='900 11px sans-serif';ctx.textAlign='center';ctx.fillText(b.type==='life'?'♥':b.type==='speed'?'»':b.type==='wide'?'▰':b.type==='double'?'Ⅱ':b.type==='triple'?'Ⅲ':'Ⅴ',b.x,b.y+4);}});particles.forEach(p=>{ctx.globalAlpha=p.life;ctx.fillStyle=p.color;ctx.fillRect(p.x,p.y,4,4)});ctx.globalAlpha=1;drawPlayer();const transitionRemaining=transitionUntil-performance.now();if(transitionRemaining>0){const progress=transitionRemaining/GAME_CONFIG.transitionDuration;ctx.save();ctx.globalAlpha=Math.min(1,progress*2,1-(progress-.5)*2);ctx.fillStyle='#fff';ctx.font='900 22px sans-serif';ctx.textAlign='center';ctx.shadowColor='#101947';ctx.shadowBlur=10;ctx.fillText(transitionLabel,d.w/2,105);ctx.restore();}}
+function render(){const d=dimensions();ctx.clearRect(0,0,d.w,d.h);drawBackgroundMotif();enemies.forEach(e=>{if(e.bossShot){const sprite=window.spriteTheme?.get(e.bossProjectileKey);if(sprite){ctx.save();ctx.imageSmoothingEnabled=false;ctx.drawImage(sprite,e.x-12,e.y-12,24,24);ctx.restore();}else{ctx.fillStyle=boss?.accent||'#ff9eb9';ctx.beginPath();ctx.arc(e.x,e.y,8,0,Math.PI*2);ctx.fill();}}else drawEnemy(e);});if(boss)drawBoss(boss);shots.forEach(drawPlayerProjectile);bonuses.forEach(b=>{const sprite=window.spriteTheme?.get(b.type);if(sprite){ctx.save();ctx.imageSmoothingEnabled=false;ctx.drawImage(sprite,b.x-20,b.y-20,40,40);ctx.restore();}else{ctx.fillStyle=b.color;ctx.beginPath();ctx.arc(b.x,b.y,16,0,Math.PI*2);ctx.fill();ctx.fillStyle='#17204c';ctx.font='900 11px sans-serif';ctx.textAlign='center';ctx.fillText(b.type==='life'?'♥':b.type==='speed'?'»':b.type==='wide'?'▰':b.type==='double'?'Ⅱ':b.type==='triple'?'Ⅲ':'Ⅴ',b.x,b.y+4);}});particles.forEach(p=>{ctx.globalAlpha=p.life;ctx.fillStyle=p.color;ctx.fillRect(p.x,p.y,4,4)});ctx.globalAlpha=1;drawPlayer();const transitionRemaining=transitionUntil-performance.now();if(transitionRemaining>0){const progress=transitionRemaining/GAME_CONFIG.transitionDuration;ctx.save();ctx.globalAlpha=Math.min(1,progress*2,1-(progress-.5)*2);ctx.fillStyle='#fff';ctx.font='900 22px sans-serif';ctx.textAlign='center';ctx.shadowColor='#101947';ctx.shadowBlur=10;ctx.fillText(transitionLabel,d.w/2,105);ctx.restore();}}
 let previous=performance.now();function loop(time){requestAnimationFrame(loop);const dt=Math.min((time-previous)/1000,.035);previous=time;if(running&&!paused)update(dt,time);render();}
 function updateEnemyLabels(){const labels=themes[ACTIVE_THEME]?.labels?.enemies||{};document.querySelectorAll('[data-enemy-id]').forEach(element=>{const label=labels[element.dataset.enemyId];if(label)element.textContent=label;});}
 function updateHud(){const totalEnemies=totalEnemiesForMission();document.querySelector('#score').textContent=score.toLocaleString('fr-FR');document.querySelector('#lives').textContent='♥ '.repeat(Math.max(0,lives));document.querySelector('#lives').setAttribute('aria-label',`${lives} vies`);document.querySelector('#progressText').textContent=`${destroyed} / ${totalEnemies}`;document.querySelector('#progressBar').style.width=`${Math.min(destroyed/totalEnemies*100,100)}%`;document.querySelector('#wave').textContent=`${level}.${wave}`;const status=document.querySelector('#bonusStatus');if(status)status.textContent=Object.keys(activeBonuses).length?Object.keys(activeBonuses).map(type=>themedBonus(type)?.statusLabel).join(' + '):'BONUS : —';updateEnemyLabels();}
