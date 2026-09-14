@@ -1,0 +1,4 @@
+project_id = "ezggaljiewdrjxkahuth"
+
+[functions.submit-score]
+verify_jwt = false
