@@ -39,8 +39,8 @@ const GAME_CONFIG = {
   playerSpeedStart: 270,
   playerSpeedPerLevel: .03,
   transitionDuration: 1200,
-  bossHealthStart: 12,
-  bossHealthPerEncounter: 5
+  bossHealthStart: 36,
+  bossHealthPerEncounter: 15
 };
 let level = 1, wave = 1, boss = null, transitionUntil = 0, transitionLabel = '';
 const bossTypes = [
