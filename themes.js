@@ -19,11 +19,11 @@ const themes = {
       player: 'Joueur',
       playerProjectile: 'Tir',
       enemies: {
-        carie: 'Carie vorace',
-        tartre: 'Tartre tenace',
-        sucre: 'Sucre collant'
+        carie: 'Lunettes trop chères',
+        tartre: 'Implants douteux',
+        sucre: 'Devis trop élevés'
       },
-      bosses: ['TARTRE BLINDÉ', 'REINE SUCRÉE', 'CARIE VOLANTE', 'MÉGAMOLAIRE'],
+      bosses: ['LUNETTES TROP CHÈRES', 'IMPLANTS DOUTEUX', 'DEVIS TROP ÉLEVÉS', 'FACTURE INATTENDUE'],
       bonuses: {
         speed: { name: 'Vitesse', statusLabel: 'PLUS VITE' },
         wide: { name: 'Tir Large', statusLabel: 'TIR LARGE' },
@@ -73,15 +73,15 @@ const themes = {
       player: 'Assuré Santéclair (Joueur)',
       playerProjectile: 'Tiers Payant (Tir)',
       enemies: {
-        carie: 'Dépassement d’honoraire (ex-Carie)',
-        tartre: 'Reste à Charge (RAC) (ex-Tartre)',
-        sucre: 'Délai d’Attente (ex-Sucre)'
+        carie: 'Lunettes trop chères',
+        tartre: 'Implants douteux',
+        sucre: 'Devis trop élevés'
       },
       bosses: [
-        'Monstre du Rest-à-Charge (ex-Tartre Blindé)',
-        'Le Désert Médical (ex-Reine Sucrée)',
-        'Le Fake Doc / Charlatan (ex-Carie Volante)',
-        'La Facture Salée (ex-Mégamolaire)'
+        'Lunettes trop chères',
+        'Implants douteux',
+        'Devis trop élevés',
+        'Facture inattendue'
       ],
       bonuses: {
         speed: { name: 'Téléconsultation 24/7 (Vitesse)', statusLabel: 'Vitesse' },

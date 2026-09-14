@@ -1,4 +1,4 @@
-# Dental Defender
+# Simon contre les dépenses de santé
 
 Mini-jeu d'arcade inspiré de Space Invaders : déplacez le dentiste, tirez sur les caries, le tartre et les sucres, puis tentez de compléter la mission du jour.
 
@@ -12,7 +12,7 @@ Ouvrez ensuite <http://localhost:4173>.
 
 ## Publier avec GitHub Pages
 
-Le workflow [Deploy Dental Defender to GitHub Pages](.github/workflows/deploy-pages.yml) publie automatiquement le jeu lors de chaque envoi sur la branche `main`. Il peut aussi être lancé manuellement depuis l'onglet **Actions** de GitHub.
+Le workflow de déploiement vers GitHub Pages (.github/workflows/deploy-pages.yml) publie automatiquement le jeu lors de chaque envoi sur la branche `main`. Il peut aussi être lancé manuellement depuis l'onglet **Actions** de GitHub.
 
 Après avoir envoyé le projet sur GitHub :
 

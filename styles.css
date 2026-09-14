@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800;900&display=swap');
 
-:root { --navy:#111945; --blue:#2973f0; --cyan:#43d4dc; --cream:#f8f4ed; --ink:#11183f; --muted:#7b819b; --pink:#ff617b; }
+:root { --navy:#111945; --blue:#2973f0; --cyan:#43d4dc; --cream:#f8f4ed; --ink:#11183f; --muted:#7b819b; --pink:#ff617b; --hud-bg:#1f6675e6; }
 * { box-sizing:border-box; }
 body { margin:0; min-width:320px; color:var(--ink); font-family:'Nunito',system-ui,sans-serif; background:var(--cream); }
 button { font:inherit; }
@@ -27,14 +27,14 @@ h1 { margin:0; font-size:26px; line-height:1.1; letter-spacing:-.6px; }
 
 .game-watermark-logo { position:absolute; z-index:1; inset:0; background:url("assets/sprites/mysanteclair_mini.svg") center calc(50% - 70px) / auto 120px no-repeat; opacity:var(--watermark-opacity); pointer-events:none; }
 .game-area::after { content:var(--watermark-text); position:absolute; z-index:1; inset:0; display:flex; align-items:center; justify-content:center; padding:24px; color:var(--watermark-color); font-size:clamp(20px,2.5vw,34px); font-weight:800; line-height:1.2; letter-spacing:.2px; text-align:center; opacity:var(--watermark-opacity); transform:translateY(64px); pointer-events:none; }
-.game-hud { position:absolute; z-index:3; left:0; right:0; top:0; height:75px; padding:17px 30px; display:grid; grid-template-columns:1fr 1fr 1fr; color:#fff; background:#1f6675e6; border-bottom:1px solid #ffffff33; }
+.game-hud { position:absolute; z-index:3; left:0; right:0; top:0; height:75px; padding:17px 30px; display:grid; grid-template-columns:1fr 1fr 1fr; color:#fff; background:var(--hud-bg); border-bottom:1px solid #ffffff33; }
 .hud-item { display:flex; flex-direction:column; align-items:flex-start; }.hud-item.center{align-items:center}.hud-item.right{align-items:flex-end}
 .hud-pause{position:absolute;right:18px;top:10px;padding:6px 9px;font-size:8px}.hud-item span { color:#d1e9e7; font-size:9px; font-weight:900; letter-spacing:1.5px; }.hud-item strong { color:#fff; font-size:19px; font-weight:900; }.hud-item strong b{color:#b8f0e8}.hearts { color:#ff5d7b!important; font-size:20px!important; letter-spacing:4px!important; }
 #gameCanvas { position:absolute; z-index:2; left:0; top:75px; width:100%; height:calc(100% - 75px); pointer-events:none; }
 .joystick{display:none;position:absolute;z-index:6;right:18px;bottom:18px;width:94px;height:94px;border:2px solid #ffffff45;border-radius:50%;background:#182458aa;touch-action:none}.joystick span{display:block;width:42px;height:42px;margin:24px;border-radius:50%;background:#4c9da3;box-shadow:0 4px 15px #4c9da333}
 @media (hover:none), (pointer:coarse){.joystick{display:block}}
 .touch-controls{display:none;position:relative;}
-.game-message { position:absolute; z-index:4; width:390px; left:50%; top:51%; transform:translate(-50%,-50%); padding:29px; text-align:center; border:1px solid #ffffff24; border-radius:19px; color:white; background:#192257e8; box-shadow:0 18px 50px #050a27aa; backdrop-filter:blur(5px); }
+.game-message { position:absolute; z-index:4; width:390px; left:50%; top:51%; transform:translate(-50%,-50%); padding:29px; text-align:center; border:1px solid #ffffff24; border-radius:19px; color:white; background:var(--hud-bg); box-shadow:0 18px 50px #050a27aa; backdrop-filter:blur(5px); }
 .game-message.hidden { display:none; }.message-icon { display:grid; place-items:center; width:45px; height:45px; margin:0 auto 11px; border-radius:13px; color:#18214d; background:#51d8df; font-size:24px; }.game-message h2{margin:0 0 6px;font-size:22px}.game-message p{margin:0 auto 20px;color:#aab0d0;font-size:13px;max-width:280px;line-height:1.5}
 .primary-button { width:100%; padding:14px 18px; border:0; border-radius:10px; color:white; background:linear-gradient(135deg,#2679f3,#315ee7); font-size:11px; font-weight:900; letter-spacing:.8px; cursor:pointer; box-shadow:0 8px 20px #07144466; }.primary-button span{float:right;font-size:17px;line-height:14px}
 .controls-hint { position:absolute; z-index:3; bottom:15px; left:18px; display:flex; align-items:center; gap:5px; white-space:nowrap; color:#7680ad; font-size:8px; font-weight:900; letter-spacing:1px; }.controls-hint span{width:1px;height:14px;background:#444d7a;margin:0 8px}.controls-hint kbd{min-width:21px;padding:4px 6px;border:1px solid #515b88;border-radius:5px;color:#aeb7dc;background:#222c5c;font:inherit;text-align:center}
